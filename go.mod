@@ -1,4 +1,4 @@
-module github.com/foolin/echo-template
+module echotemplate
 
 require (
 	github.com/GeertJohan/go.rice v0.0.0-20181229193832-0af3f3b09a0a

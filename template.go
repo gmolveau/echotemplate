@@ -102,6 +102,7 @@ func (e *TemplateEngine) executeTemplate(out io.Writer, name string, data interf
 		err := e.executeTemplate(buf, layout, data, false)
 		return template.HTML(buf.String()), err
 	}
+	allFunc["templateName"] = func() string { return name }
 
 	// Get the plugin collection
 	for k, v := range e.config.Funcs {

@@ -1,7 +1,7 @@
 package gorice
 
 import (
-	"github.com/foolin/echo-template"
+	"echotemplate"
 	"github.com/GeertJohan/go.rice"
 )
 
