@@ -6,12 +6,7 @@
  *
  */
 
-/*
-Golang template for echo framework, Use golang html/template syntax,
-Easy and simple to use for echo framework, See https://github.com/foolin/echo-template
-for more information.
-*/
-package echotemplate // import "github.com/foolin/echo-template"
+package echotemplate
 
 import (
 	"bytes"
