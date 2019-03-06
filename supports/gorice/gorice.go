@@ -1,13 +1,13 @@
 package gorice
 
 import (
-	"echotemplate"
 	"github.com/GeertJohan/go.rice"
+	"github.com/gmolveau/echotemplate"
 )
 
 /**
 New echo template engine, default views root.
- */
+*/
 func New(viewsRootBox *rice.Box) *echotemplate.TemplateEngine {
 	return NewWithConfig(viewsRootBox, echotemplate.DefaultConfig)
 }
@@ -15,7 +15,7 @@ func New(viewsRootBox *rice.Box) *echotemplate.TemplateEngine {
 /**
 New echo template engine
 Important!!! The viewsRootBox's name and config.Root must be consistent.
- */
+*/
 func NewWithConfig(viewsRootBox *rice.Box, config echotemplate.TemplateConfig) *echotemplate.TemplateEngine {
 	config.Root = viewsRootBox.Name()
 	engine := echotemplate.New(config)
