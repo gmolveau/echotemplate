@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Foolin.  All rights reserved.
+ * Copyright 2018 Foolin + gmolveau.  All rights reserved.
  *
  * Use of this source code is governed by a MIT style
  * license that can be found in the LICENSE file.
@@ -19,6 +19,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
 )
 
@@ -95,6 +96,11 @@ func (e *TemplateEngine) executeTemplate(out io.Writer, name string, data interf
 	allFuncs["include"] = func(layout string) (template.HTML, error) {
 		buf := new(bytes.Buffer)
 		err := e.executeTemplate(buf, layout, data, false)
+		return template.HTML(buf.String()), err
+	}
+	allFuncs["includeWithData"] = func(layout string, tpl_key string, data interface{}) (template.HTML, error) {
+		buf := new(bytes.Buffer)
+		err = e.executeTemplate(buf, layout, echo.Map{tpl_key:data},false)
 		return template.HTML(buf.String()), err
 	}
 	allFuncs["templateName"] = func() string { return name }
@@ -201,5 +207,23 @@ func DefaultFileHandler() FileHandler {
 			return "", fmt.Errorf("TemplateEngine render read name:%v, path:%v, error: %v", tplFile, path, err)
 		}
 		return string(data), nil
+	}
+}
+
+func NewRice(viewsRootBox *rice.Box) *TemplateEngine {
+	return NewWithConfigRice(viewsRootBox, DefaultConfig)
+}
+
+func NewWithConfigRice(viewsRootBox *rice.Box, config TemplateConfig) *TemplateEngine {
+	config.Root = viewsRootBox.Name()
+	engine := New(config)
+	engine.SetFileHandler(FileHandlerRice(viewsRootBox))
+	return engine
+}
+
+func FileHandlerRice(viewsRootBox *rice.Box) FileHandler {
+	return func(config TemplateConfig, tplFile string) (content string, err error) {
+		// get file contents as string
+		return viewsRootBox.String(tplFile + config.Extension)
 	}
 }
