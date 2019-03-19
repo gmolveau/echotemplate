@@ -98,9 +98,9 @@ func (e *TemplateEngine) executeTemplate(out io.Writer, name string, data interf
 		err := e.executeTemplate(buf, layout, data, false)
 		return template.HTML(buf.String()), err
 	}
-	allFuncs["includeWithData"] = func(layout string, tpl_key string, data interface{}) (template.HTML, error) {
+	allFuncs["includeWithData"] = func(layout string, tpl_key string, new_data interface{}) (template.HTML, error) {
 		buf := new(bytes.Buffer)
-		err = e.executeTemplate(buf, layout, echo.Map{tpl_key:data},false)
+		err = e.executeTemplate(buf, layout, echo.Map{tpl_key:new_data, "_parent":data},false)
 		return template.HTML(buf.String()), err
 	}
 	allFuncs["templateName"] = func() string { return name }
