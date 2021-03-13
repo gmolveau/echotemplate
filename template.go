@@ -10,6 +10,7 @@ package echotemplate
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"html/template"
 	"io"
@@ -19,7 +20,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/GeertJohan/go.rice"
+	rice "github.com/GeertJohan/go.rice"
 	"github.com/labstack/echo/v4"
 )
 
@@ -100,7 +101,7 @@ func (e *TemplateEngine) executeTemplate(out io.Writer, name string, data interf
 	}
 	allFuncs["includeWithData"] = func(layout string, tpl_key string, new_data interface{}) (template.HTML, error) {
 		buf := new(bytes.Buffer)
-		err = e.executeTemplate(buf, layout, echo.Map{tpl_key:new_data, "_parent":data},false)
+		err = e.executeTemplate(buf, layout, echo.Map{tpl_key: new_data, "_parent": data}, false)
 		return template.HTML(buf.String()), err
 	}
 	allFuncs["templateName"] = func() string { return name }
@@ -223,7 +224,26 @@ func NewWithConfigRice(viewsRootBox *rice.Box, config TemplateConfig) *TemplateE
 
 func FileHandlerRice(viewsRootBox *rice.Box) FileHandler {
 	return func(config TemplateConfig, tplFile string) (content string, err error) {
-		// get file contents as string
 		return viewsRootBox.String(tplFile + config.Extension)
+	}
+}
+
+func NewEmbed(fs embed.FS) *TemplateEngine {
+	return NewWithConfigEmbed(fs, DefaultConfig)
+}
+
+func NewWithConfigEmbed(fs embed.FS, config TemplateConfig) *TemplateEngine {
+	engine := New(config)
+	engine.SetFileHandler(FileHandlerEmbed(fs))
+	return engine
+}
+
+func FileHandlerEmbed(fs embed.FS) FileHandler {
+	return func(config TemplateConfig, tplFile string) (content string, err error) {
+		data, err := fs.ReadFile(config.Root + string(os.PathSeparator) + tplFile + config.Extension)
+		if err != nil {
+			return "", fmt.Errorf("TemplateEngine render read name:%v, error: %v", tplFile, err)
+		}
+		return string(data), nil
 	}
 }
